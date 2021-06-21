@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    Layout = null;
+}
+<h1>資料分頁</h1>
+
+<table border="1" id="ZM1DataTable">
+    <thead>
+        <tr>
+            <th>編號</th>
+            <th>名稱</th>
+        </tr>
+    </thead>
+    <tbody id="DataTable"></tbody>
+</table>
+<div class="Data_center">
+    <div class="Data_pagination" id="pagination"></div>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    var MaxPageNum = 0;
+    $(document).ready(function () {
+        $.ajax({
+            type: "Post",
+            url: "../Home/GetPage",
+            data: JSON.stringify({
+
+            }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                var jo = JSON.parse(data.d);
+                MaxPageNum = Math.ceil(jo.length / 15);
+                //$("#Msg").text(MaxPageNum);
+                $("#pagination").append("<span id='PrevPage'>&laquo;</span>");
+                for (i = 1; i <= MaxPageNum; i++) {
+                    $("#pagination").append("<span id='page" + i + "' name='page'>" + i + "</span>");
+                }
+                $("#pagination").append("<span id='NextPage'>&raquo;</span>");
+                var pageIndex = document.querySelector('#page1');
+                pageIndex.setAttribute('class', 'active');
+            }
+        })
+
+        GetData(1, 15);
+    });
+
+    var page = 1;
+    //下一頁
+    $("#pagination").on('click', '#NextPage', function () {
+        if (Number(page) + 1 <= MaxPageNum) {
+            var Index = "#page" + page;
+            $(Index).attr("class", "");
+
+            page = Number(page) + 1;
+            GetData(15 * (page - 1) + 1, 15 * page);
+
+            var Index = "#page" + page;
+            $(Index).attr("class", "active");
+        }
+        else {
+            alert("已經在最後一頁");
+        }
+    });
+
+    //上一頁
+    $("#pagination").on('click', '#PrevPage', function () {
+        if (page - 1 >= 1) {
+            var Index = "#page" + page;
+            $(Index).attr("class", "");
+
+            page = Number(page) - 1;
+            GetData(15 * (page - 1) + 1, 15 * page);
+
+            var Index = "#page" + page;
+            $(Index).attr("class", "active");
+        }
+        else {
+            alert("已經在第一頁");
+        }
+    });
+
+    //切換分頁
+    $("#pagination").on('click', '[name="page"]', function () {
+        page = $(this).text();
+        $("[name='page']").attr("class", "");
+        $(this).attr("class", "active");
+        GetData(15 * (Number(page) - 1) + 1, 15 * Number(page));
+        //alert(15 * (Number(page) - 1) + 1);
+        //alert(15 * Number(page));
+    });
+
+    //取得資料
+    function GetData(startNum, endNum) {
+        $.ajax({
+            type: "Post",
+            url: "../Home/GetData",
+            data: JSON.stringify({
+                startNum: startNum,
+                endNum: endNum
+            }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                $("#DataTable").empty();
+                var jo = JSON.parse(data.d);
+                for (i = 0; i < jo.length; i++) {
+                    $("#DataTable").append(
+                        "<tr>" +
+                        "<td>" + jo[i].Num + "</td>" +
+                        "<td>" + jo[i].Name + "</td>" +
+                        "</tr>"
+                    );
+                }
+            }
+        })
+    }
+</script>
