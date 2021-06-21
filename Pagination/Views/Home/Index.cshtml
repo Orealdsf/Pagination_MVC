@@ -1,7 +1,36 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "Home Page";
     Layout = null;
 }
+<style>
+    .Data_center {
+        text-align: center;
+    }
+
+    .Data_pagination {
+        display: inline-block;
+    }
+
+    .Data_pagination span {
+        color: black;
+        float: left;
+        padding: 8px 16px;
+        text-decoration: none;
+    }
+
+    .Data_pagination span.active {
+        background-color: #8D1D05;
+        color: white;
+    }
+
+        .Data_pagination span:hover:not(.active) {
+            background-color: #ddd;
+        }
+
+   
+</style>
+
 <h1>資料分頁</h1>
 
 <table border="1" id="ZM1DataTable">
@@ -11,7 +40,9 @@
             <th>名稱</th>
         </tr>
     </thead>
-    <tbody id="DataTable"></tbody>
+    <tbody id="DataTable">
+       
+    </tbody>
 </table>
 <div class="Data_center">
     <div class="Data_pagination" id="pagination"></div>
@@ -31,7 +62,7 @@
             dataType: "json",
             async: false,
             success: function (data) {
-                var jo = JSON.parse(data.d);
+                var jo = JSON.parse(data);
                 MaxPageNum = Math.ceil(jo.length / 15);
                 //$("#Msg").text(MaxPageNum);
                 $("#pagination").append("<span id='PrevPage'>&laquo;</span>");
@@ -106,7 +137,7 @@
             async: false,
             success: function (data) {
                 $("#DataTable").empty();
-                var jo = JSON.parse(data.d);
+                var jo = JSON.parse(data);
                 for (i = 0; i < jo.length; i++) {
                     $("#DataTable").append(
                         "<tr>" +
